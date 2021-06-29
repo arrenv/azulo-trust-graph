@@ -1,5 +1,5 @@
 specVersion: 0.0.2
-description: Gnosis Safe Subgraph
+description: Azulo Trust Subgraph
 schema:
   file: ./schema.graphql
 dataSources:

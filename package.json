@@ -1,5 +1,5 @@
 {
-  "name": "gnosis-safe-subgraph",
+  "name": "azulo-trust-graph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

@@ -1,7 +1,16 @@
+#Azulo Trust Subgraph
 
-# Gnosis Safe subgraph
+This subgraph tracks activity on trusts and transactions within Azulo's multi-sig wallets. 
 
-This Subgraph dynamically tracks activity on any Gnosis Safe multisignature wallets deployed through the factory.
+The purpose is show to show transparency of Azulo's trusts through usage data. 
+
+Built by the [Azulo](https://azulo.app) team.
+
+### Notes
+Azulo is built using Gnosis Safe Contracts.
+
+For more information see the [Gnosis Safe docs](https://gnosis-safe.readthedocs.io/en/latest/) and/or the [docs for The Graph](https://thegraph.com/docs/).
+
 
 ### Networks:
 
@@ -10,20 +19,15 @@ This Subgraph dynamically tracks activity on any Gnosis Safe multisignature wall
 
 ## Prerequiste
 
-- libsecret-1-dev (ubuntu)
-```
-$ sudo apt-get install libsecret-1-dev
-```
-
 - yarn
 ```
-$ sudo apt-get install yarn
+install yarn
 ```
 
 - graph-cli
 
 ```
-$ yarn global add @graphprotocol/graph-cli
+yarn global add @graphprotocol/graph-cli
 ```
 
 ## Getting started
@@ -31,21 +35,16 @@ $ yarn global add @graphprotocol/graph-cli
 0. Get the source and install the dependencies
 
 ```
-$ git git@github.com:radicle-dev/gnosis-safe-subgraph.git
-$ cd ./gnosis-safe-subgraph
-$ npm install
+yarn install
 ```
 
 1. Build
 
 ```
-$ ./script/build.sh [--reset] [--code-gen] [--network mainnet|rinkeby|ropsten]
+yarn prepare:mainnet
+yarn codegen
+yarn build
 ```
-
-- `--reset -r` deletes the build and generated code folders [optional, default: false]
-- `--code-gen -c` (re)generate code from schema [optional, default: false]
-- `--network -n` select a target network (mainnet, ropsten or rinkeby) [optional, default: mainnet]
-
 
 ## Deployment
 
@@ -58,12 +57,8 @@ $ graph auth https://api.thegraph.com/deploy/ <token>
 2. Deploy
 
 ```
-$ ./script/deploy.sh [--network mainnet|rinkeby|ropsten] [--local]
+graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ <github username>/<project name>
 ```
-
-- `--network -n` select a target network (mainnet, ropsten or rinkeby) [optional, default: mainnet]
-- `--local -l`  deploy on a local node instead of a TheGraph node (https://api.thegraph.com/deploy/) [optional, default: false]
-
 
 ## Model
 
@@ -107,7 +102,3 @@ $ ./script/deploy.sh [--network mainnet|rinkeby|ropsten] [--local]
   }
 }
 
-```
-## Copyright
-
-(c) 2021 Greg Jeanmart
