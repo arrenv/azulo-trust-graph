@@ -100,6 +100,47 @@ export function handleExecTransaction(call: ExecTransactionCall): void {
     let wallet = Wallet.load(walletAddr.toHex())
 
     let walletInstance = GnosisSafe.bind(walletAddr)
+    
+    let pair = Pair.load(event.address.toHexString())
+    let token0 = Token.load(pair.token0)
+    let amount0In = convertTokenToDecimal(event.params.amount0In, token0.decimals)
+    let amount0Out = convertTokenToDecimal(event.params.amount0Out, token0.decimals)
+
+    // totals for volume updates
+    let amount0Total = amount0Out.plus(amount0In)
+  
+    // ETH/USD prices
+    let bundle = Bundle.load('1')
+  
+    // get total amounts of derived USD and ETH for tracking
+    let derivedAmountETH = token1.derivedETH
+      .times(amount1Total)
+      .plus(token0.derivedETH.times(amount0Total))
+      .div(BigDecimal.fromString('2'))
+    let derivedAmountUSD = derivedAmountETH.times(bundle.ethPrice)
+  
+    // only accounts for volume through white listed tokens
+    let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0 as Token, amount1Total, token1 as Token, pair as Pair)
+  
+    let trackedAmountETH: BigDecimal
+    if (bundle.ethPrice.equals(ZERO_BD)) {
+      trackedAmountETH = ZERO_BD
+    } else {
+      trackedAmountETH = trackedAmountUSD.div(bundle.ethPrice)
+    }
+  
+    // update global values, only used tracked amounts for volume
+    let uniswap = UniswapFactory.load(FACTORY_ADDRESS)
+    uniswap.totalVolumeUSD = uniswap.totalVolumeUSD.plus(trackedAmountUSD)
+    uniswap.totalVolumeETH = uniswap.totalVolumeETH.plus(trackedAmountETH)
+    uniswap.untrackedVolumeUSD = uniswap.untrackedVolumeUSD.plus(derivedAmountUSD)
+    uniswap.txCount = uniswap.txCount.plus(ONE_BI)
+
+    // swap specific updating
+    uniswapDayData.dailyVolumeUSD = uniswapDayData.dailyVolumeUSD.plus(trackedAmountUSD)
+    uniswapDayData.dailyVolumeETH = uniswapDayData.dailyVolumeETH.plus(trackedAmountETH)
+    uniswapDayData.dailyVolumeUntracked = uniswapDayData.dailyVolumeUntracked.plus(derivedAmountUSD)
+    uniswapDayData.save()
 
     if(wallet != null) {
         let currentNonce = walletInstance.nonce()
@@ -120,10 +161,16 @@ export function handleExecTransaction(call: ExecTransactionCall): void {
 
         if(call.inputs.data.length < 2700) { // max size of a column. In some very rare cases, the method data bytecode is very long
             transaction.data = call.inputs.data
+            log.warning("wallet: {} transaction {} - store transaction.data, length: {}",
+                        [walletAddr.toHexString(), call.transaction.hash.toHexString(), ByteArray.fromI32(call.inputs.data.length).toHexString()])
         } else {
             log.warning("wallet: {} transaction {} - cannot store transaction.data (too long), length: {}",
                         [walletAddr.toHexString(), call.transaction.hash.toHexString(), ByteArray.fromI32(call.inputs.data.length).toHexString()])
         }
+        log.info(" transaction.value",
+                    [call.inputs.value.toHexString()])
+        log.info(" transaction.destination",
+                    [call.inputs.to.toHexString()])
         transaction.value = call.inputs.value
         transaction.destination = call.inputs.to
         transaction.signatures = call.inputs.signatures

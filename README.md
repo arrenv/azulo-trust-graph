@@ -14,8 +14,8 @@ For more information see the [Gnosis Safe docs](https://gnosis-safe.readthedocs.
 
 ### Networks:
 
-- Ropsten https://thegraph.com/explorer/subgraph/radicle-dev/gnosis-safe-ropsten
-- Mainnet https://thegraph.com/explorer/subgraph/radicle-dev/gnosis-safe-mainnet
+- Mainnet https://thegraph.com/explorer/subgraph/arrenv/azulo-trust-graph
+- Rinkeby https://thegraph.com/explorer/subgraph/arrenv/azulo-trust-graph-rinkeby
 
 ## Prerequiste
 

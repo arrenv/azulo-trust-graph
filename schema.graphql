@@ -1,9 +1,42 @@
 
+type AzuloTrustFactory @entity {
+    # factory address
+    id: ID!
+
+    # total volume
+    totalVolumeUSD: BigDecimal!
+    totalVolumeETH: BigDecimal!
+
+    # untracked values - less confident USD scores
+    untrackedVolumeUSD: BigDecimal!
+
+    # total assets
+    totalAssetsUSD: BigDecimal!
+    totalAssetsETH: BigDecimal!
+
+    # transactions
+    txCount: BigInt!
+}
+
+type AzuloTrustDaily @entity {
+    id: ID! # timestamp rounded to current day by dividing by 86400
+    date: Int!
+
+    dailyVolumeETH: BigDecimal!
+    dailyVolumeUSD: BigDecimal!
+    dailyVolumeUntracked: BigDecimal!
+
+    totalVolumeETH: BigDecimal!
+    totalVolumeUSD: BigDecimal! # Accumulate at each trade, not just calculated off whatever totalVolume is. making it more accurate as it is a live conversion
+
+    txCount: BigInt!
+}
+
 type Wallet @entity {
     "Unique identifier of the wallet (contract Address)"
     id                  : ID!
 
-    "ddress who created the contract"
+    "Address who created the contract"
     creator             : Bytes!
 
     "Network where the wallet is deployed (plain text: rinkeby, ropsten, mainnet, etc.)"
@@ -24,9 +57,14 @@ type Wallet @entity {
     "Number of confirmation required to execute a transaction out of the wallet"
     threshold           : BigInt!
 
-    "List of sucessful and failed transactions executed from the wallet"
+    "List of successful and failed transactions executed from the wallet"
     transactions        : [Transaction!]!
 
+    "Value of total assets held in USD"
+    totalAssetsUSD: BigDecimal!
+
+    "Value of total assets held in ETH"
+    totalAssetsETH: BigDecimal!
 }
 
 type Transaction @entity {
@@ -48,7 +86,7 @@ type Transaction @entity {
     "Transaction hash on the Safe"
     txhash              : Bytes
 
-    "Ether Amount (in WEI) included in the transaction - transfered from the wallet when the transaction is executed"
+    "Ether Amount (in WEI) included in the transaction - transferred from the wallet when the transaction is executed"
     value               : BigInt
 
     "Destination of the transaction"
@@ -69,7 +107,7 @@ type Transaction @entity {
     "Estimated Gas that should be used for the Safe transaction."
     estimatedSafeTxGas  : BigInt
 
-    "Estimated Gas costs for that are indipendent of the transaction execution (e.g. base transaction fee, signature check, payment of the refund)"
+    "Estimated Gas costs for that are independent of the transaction execution (e.g. base transaction fee, signature check, payment of the refund)"
     estimatedBaseGas    : BigInt
 
     "gasPrice (in gasToken)"
@@ -99,4 +137,20 @@ enum TransactionStatus {
 enum Operation {
     CALL
     DELEGATE_CALL
+}
+
+type Token @entity {
+  # token address
+  id: ID!
+
+  # mirrored from the smart contract
+  symbol: String!
+  name: String!
+  decimals: BigInt!
+
+  # used for other stats like marketcap
+  totalSupply: BigInt!
+
+  # derived prices
+  derivedETH: BigDecimal
 }
