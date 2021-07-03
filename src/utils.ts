@@ -1,4 +1,6 @@
 import { BigInt, ByteArray, log, BigDecimal, Address } from '@graphprotocol/graph-ts'
+// import { Factory as FactoryContract } from '../generated/templates/Pair/Factory'
+import { TrustToken, Trust } from '../generated/schema'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const FACTORY_ADDRESS = '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B'
@@ -8,6 +10,8 @@ export let ONE_BI = BigInt.fromI32(1)
 export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
+
+// export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
 export function zeroBigInt(): BigInt {
   return BigInt.fromI32(0)
@@ -67,3 +71,49 @@ export const WHITELIST: string[] = [
   '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI
   '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599' // WBTC
 ]
+
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bd = BigDecimal.fromString('1')
+  for (let i = 0; i < decimals; i++) {
+    bd = bd.times(BigDecimal.fromString('10'))
+  }
+  return bd
+}
+
+export let zeroBD = BigDecimal.fromString('0')
+
+export function createTrustToken(
+  TokenStatsID: string,
+  TokenUserID: string,
+  symbol: string,
+  trust: string,
+  assetID: string,
+): TrustToken {
+  let TokenStats = new TrustToken(TokenStatsID)
+  TokenStats.symbol = symbol
+  TokenStats.asset = assetID
+  TokenStats.trust = trust
+  TokenStats.balance = zeroBD
+  TokenStats.trustID = TokenUserID
+  return TokenStats
+}
+
+export function createTrust(trustID: string): Trust {
+  let trust = new Trust(trustID)
+  trust.save()
+  return trust
+}
+
+export function updateCommonTokenStats(
+  assetID: string,
+  assetSymbol: string,
+  trustID: string
+): TrustToken {
+  let TokenStatsID = assetID.concat('-').concat(trustID)
+  let TokenUserID = trustID
+  let TokenStats = TrustToken.load(TokenStatsID)
+  if (TokenStats == null) {
+    TokenStats = createTrustToken(TokenStatsID, TokenUserID, assetSymbol, trustID, assetID)
+  }
+  return TokenStats as TrustToken
+}
