@@ -1,9 +1,11 @@
 import { GnosisSafe, AddedOwner, RemovedOwner, ChangedThreshold,
     ExecutionSuccess, ExecutionFailure, ExecTransactionCall } from '../generated/templates/GnosisSafe/GnosisSafe'
-import { Trust, Transaction, Bundle, Asset } from '../generated/schema'
-import { oneBigInt, concat, zeroBigInt, ZERO_BD } from './utils'
+import { Trust, Transaction, Bundle, Asset, AzuloTrustFactory, TrustToken } from '../generated/schema'
+import { oneBigInt, concat, zeroBigInt, ZERO_BD, TRUST_FACTORY_ADDRESS } from './utils'
 import { log, Address, Bytes, crypto, ByteArray, BigDecimal } from '@graphprotocol/graph-ts'
-import { updateAzuloTrustDaily } from './dailyUpdates'
+import { addAzuloBeneficiaryDaily, updateAzuloTrustDailyValue } from './dailyUpdates'
+import { getEthPriceInUSD, findEthPerToken } from './pricing'
+import { Transfer } from '../generated/DAI/Token'
 
 export function handleAddedOwner(event: AddedOwner): void {
     let trustAddr = event.address
@@ -14,6 +16,13 @@ export function handleAddedOwner(event: AddedOwner): void {
         owners.push(event.params.owner)
         trust.owners = owners
         trust.save()
+
+        // load factory and add trustee/beneficiary
+        let trustFactory = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+        trustFactory.totalBeneficiaries = trustFactory.totalBeneficiaries + 1
+        trustFactory.save()
+
+        addAzuloBeneficiaryDaily(event)
 
     } else {
         log.warning("handleAddedOwner::Trust {} not found", [trustAddr.toHexString()])
@@ -32,6 +41,13 @@ export function handleRemovedOwner(event: RemovedOwner): void {
         }
         trust.owners = owners
         trust.save()
+
+        // load factory and remove trustee/beneficiary
+        let trustFactory = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+        if (trustFactory.totalBeneficiaries > 0) {
+            trustFactory.totalBeneficiaries = trustFactory.totalBeneficiaries - 1
+            trustFactory.save()
+        }
 
     } else {
         log.warning("handleRemovedOwner::Trust {} not found", [trustAddr.toHexString()])
@@ -54,32 +70,6 @@ export function handleChangedThreshold(event: ChangedThreshold): void {
 export function handleExecutionSuccess(event: ExecutionSuccess): void {
     let trustAddr = event.address
     let trust = Trust.load(trustAddr.toHex())
-    
-    // let asset = Asset.load(pair.token0)
-
-    // get total amounts of derived USD and ETH for tracking
-    let bundle = Bundle.load('1')
-    // let derivedAmountETH = token1.derivedETH
-    // .times(amount1Total)
-    // .plus(asset.derivedETH.times(amount0Total))
-    // .div(BigDecimal.fromString('2'))
-    // let derivedAmountUSD = derivedAmountETH.times(bundle.ethPrice)
-    
-    let derivedAmountUSD = BigDecimal.fromString('2').times(bundle.ethPrice) // DEV Temp for testing
-
-    // only accounts for volume through white listed tokens
-    // let trackedAmountUSD = getTrackedVolumeUSD(amountTotal, asset as Asset)
-    
-    let trackedAmountUSD = BigDecimal.fromString('2').div(BigDecimal.fromString('2'))  // DEV Temp for testing
-
-    log.warning("handleExecutionSuccess::Trust {} not found", [trustAddr.toHexString()])
-
-    let trackedAmountETH: BigDecimal
-    if (bundle.ethPrice.equals(ZERO_BD)) {
-        trackedAmountETH = ZERO_BD
-    } else {
-        trackedAmountETH = trackedAmountUSD.div(bundle.ethPrice)
-    }
 
     if(trust != null) {
         let transaction = getTransaction(trustAddr, event.params.txHash)
@@ -94,19 +84,10 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
         trust = addTransactionToTrust(<Trust> trust, transaction)
         trust.save()
 
-        // update day entities
-        let azuloDayData = updateAzuloTrustDaily(event)
-
-        azuloDayData.dailyVolumeUSD = azuloDayData.dailyVolumeUSD.plus(trackedAmountUSD)
-        azuloDayData.dailyVolumeETH = azuloDayData.dailyVolumeETH.plus(trackedAmountETH)
-        azuloDayData.dailyVolumeUntracked = azuloDayData.dailyVolumeUntracked.plus(derivedAmountUSD)
-        azuloDayData.save()
-
     } else {
         log.warning("handleExecutionSuccess::Trust {} not found", [trustAddr.toHexString()])
     }
 }
-
 
 export function handleExecutionFailure(event: ExecutionFailure): void {
     let trustAddr = event.address
@@ -179,7 +160,72 @@ export function handleExecTransaction(call: ExecTransactionCall): void {
     }
 }
 
+export function addTrustTokenAssets(event: Transfer, trustAddress: Address, trustToken: TrustToken): void {
+    let trust = Trust.load(trustAddress.toHex())
+    let asset = Asset.load(trustToken.asset)
 
+    let tokenDerivedETH = findEthPerToken(asset as Asset).times(trustToken.balance)
+    let tokenDerivedUSD = getEthPriceInUSD().times(tokenDerivedETH)
+
+    // Add value to trust
+    trust.totalAssetsETH = trust.totalAssetsETH.plus(tokenDerivedETH)
+    trust.totalAssetsUSD = trust.totalAssetsUSD.plus(tokenDerivedUSD)
+    trust.save()
+    
+    // Add value to all trusts
+    // load factory
+    let trustFactory = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+    trustFactory.totalVolumeUSD = trustFactory.totalVolumeUSD.plus(trust.totalAssetsUSD)
+    trustFactory.totalVolumeETH = trustFactory.totalVolumeETH.plus(trust.totalAssetsETH)
+    trustFactory.totalWealthUSD = trustFactory.totalWealthUSD.plus(trust.totalAssetsUSD)
+    trustFactory.totalWealthETH = trustFactory.totalWealthETH.plus(trust.totalAssetsETH)
+    trustFactory.save()
+
+    updateAzuloTrustDailyValue(event, tokenDerivedETH, tokenDerivedUSD)
+
+}
+
+export function subtractTrustTokenAssets(event: Transfer, trustAddress: Address, trustToken: TrustToken): void {
+    let trust = Trust.load(trustAddress.toHex())
+    let asset = Asset.load(trustToken.asset)
+
+    let tokenDerivedETH = findEthPerToken(asset as Asset).times(trustToken.balance)
+    let tokenDerivedUSD = getEthPriceInUSD().times(tokenDerivedETH)
+
+    // Subtract value from trust - check if not negative number
+    if (trust.totalAssetsETH.minus(tokenDerivedETH) > ZERO_BD) {
+        trust.totalAssetsETH = trust.totalAssetsETH.minus(tokenDerivedETH)
+    } else {
+        trust.totalAssetsETH = ZERO_BD
+    }
+    if (trust.totalAssetsUSD.minus(tokenDerivedUSD) > ZERO_BD) {
+        trust.totalAssetsUSD = trust.totalAssetsUSD.minus(tokenDerivedUSD)
+    } else {
+        trust.totalAssetsUSD = ZERO_BD
+    }
+    
+    trust.save()
+    
+    // Add value to all trusts
+    // load factory
+    let trustFactory = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+    trustFactory.totalVolumeUSD = trustFactory.totalVolumeUSD.plus(trust.totalAssetsUSD)
+    trustFactory.totalVolumeETH = trustFactory.totalVolumeETH.plus(trust.totalAssetsETH)
+    if (trustFactory.totalWealthETH.plus(trust.totalAssetsETH) > ZERO_BD) {
+        trustFactory.totalWealthETH = trustFactory.totalWealthETH.minus(trust.totalAssetsETH)
+    } else {
+        trustFactory.totalWealthETH = ZERO_BD
+    }
+    if (trustFactory.totalWealthUSD.minus(trust.totalAssetsUSD) > ZERO_BD) {
+        trustFactory.totalWealthUSD = trustFactory.totalWealthUSD.minus(trust.totalAssetsUSD)
+    } else {
+        trustFactory.totalWealthUSD = ZERO_BD
+    }
+    trustFactory.save()
+
+    updateAzuloTrustDailyValue(event, tokenDerivedETH, tokenDerivedUSD)
+
+}
 
 
 /*

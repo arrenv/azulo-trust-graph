@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import { Asset, Bundle, Pair } from '../generated/schema'
 import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts/index'
-import { ZERO_BD, ADDRESS_ZERO, ONE_BD } from './utils'
+import { ZERO_BD, ADDRESS_ZERO, ONE_BD, factoryContract } from './utils'
 
 const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 const USDC_WETH_PAIR = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' // created 10008355
@@ -72,24 +72,24 @@ let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('2')
  * Search through graph to find derived Eth per token.
  * @todo update to be derived ETH (add stablecoin estimates)
  **/
-// export function findEthPerToken(token: Asset): BigDecimal {
-//   if (token.id == WETH_ADDRESS) {
-//     return ONE_BD
-//   }
-//   // loop through whitelist and check if paired with any
-//   for (let i = 0; i < WHITELIST.length; ++i) {
-//     let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
-//     if (pairAddress.toHexString() != ADDRESS_ZERO) {
-//       let pair = Pair.load(pairAddress.toHexString())
-//       if (pair.token0 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         let token1 = Asset.load(pair.token1)
-//         return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
-//       }
-//       if (pair.token1 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         let token0 = Asset.load(pair.token0)
-//         return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
-//       }
-//     }
-//   }
-//   return ZERO_BD // nothing was found return 0
-// }
+export function findEthPerToken(asset: Asset): BigDecimal {
+  if (asset.id == WETH_ADDRESS) {
+    return ONE_BD
+  }
+  // loop through whitelist and check if paired with any
+  for (let i = 0; i < WHITELIST.length; ++i) {
+    let pairAddress = factoryContract.getPair(Address.fromString(asset.id), Address.fromString(WHITELIST[i]))
+    if (pairAddress.toHexString() != ADDRESS_ZERO) {
+      let pair = Pair.load(pairAddress.toHexString())
+      if (pair.token0 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+        let token1 = Asset.load(pair.token1)
+        return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
+      }
+      if (pair.token1 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+        let token0 = Asset.load(pair.token0)
+        return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+      }
+    }
+  }
+  return ZERO_BD // nothing was found return 0
+}

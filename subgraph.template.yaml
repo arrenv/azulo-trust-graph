@@ -31,7 +31,7 @@ dataSources:
     source:
       address: "0x6b175474e89094c44da98b954eedeac495271d0f"
       abi: Token
-      startBlock: 8928158
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -52,7 +52,7 @@ dataSources:
     source:
       address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
       abi: Token
-      startBlock: 6082465
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -73,7 +73,7 @@ dataSources:
     source:
       address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
       abi: Token
-      startBlock: 4634748
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -94,7 +94,7 @@ dataSources:
     source:
       address: "0x0000000000085d4780b73119b644ae5ecd22b376"
       abi: Token
-      startBlock: 6988184
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -115,7 +115,7 @@ dataSources:
     source:
       address: "0x4fabb145d64652a948d72533023f6e7a623c7c53"
       abi: Token
-      startBlock: 8493105
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -136,7 +136,7 @@ dataSources:
     source:
       address: "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
       abi: Token
-      startBlock: 4620855
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -346,7 +346,7 @@ dataSources:
     source:
       address: "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c"
       abi: Token
-      startBlock: 3851136
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -367,7 +367,7 @@ dataSources:
     source:
       address: "0xbbbbca6a901c926f240b89eacb641d8aec7aeafd"
       abi: Token
-      startBlock: 7544036
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -388,7 +388,7 @@ dataSources:
     source:
       address: "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f"
       abi: Token
-      startBlock: 8314597
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -409,7 +409,7 @@ dataSources:
     source:
       address: "0xd7c49cee7e9188cca6ad8ff264c1da2e69d4cf3b"
       abi: Token
-      startBlock: 7815779
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -577,7 +577,7 @@ dataSources:
     source:
       address: "0x408e41876cccdc0f92210600ef50372656052a38"
       abi: Token
-      startBlock: 4827494
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -619,7 +619,7 @@ dataSources:
     source:
       address: "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
       abi: Token
-      startBlock: 7605604
+      startBlock: 9084508
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -676,6 +676,33 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+  - kind: ethereum/contract
+    name: Factory
+    network: mainnet
+    source:
+      address: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+      abi: Factory
+      startBlock: 10000834
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/pairFactory.ts
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: Factory
+          file: ./abis/factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handleNewPair
 
 templates:
   - kind: ethereum/contract
@@ -704,3 +731,32 @@ templates:
           handler: handleExecutionSuccess
         - event: ExecutionFailure(bytes32,uint256)
           handler: handleExecutionFailure
+  - kind: ethereum/contract
+    name: Pair
+    network: mainnet
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/pairFactory.ts
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: Pair
+          file: ./abis/pair.json
+        - name: Factory
+          file: ./abis/factory.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync

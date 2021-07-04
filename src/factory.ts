@@ -1,10 +1,10 @@
 import { ProxyCreation } from '../generated/GnosisSafeProxyFactory/GnosisSafeProxyFactory'
-import { GnosisSafe  } from '../generated/templates/GnosisSafe/GnosisSafe'
-import { Trust } from '../generated/schema'
+import { GnosisSafe } from '../generated/templates/GnosisSafe/GnosisSafe'
+import { Trust, Bundle, AzuloTrustFactory } from '../generated/schema'
 import { GnosisSafe as GnosisSafeContract } from '../generated/templates'
 import { updateAzuloTrustDaily } from './dailyUpdates'
 import { log, Bytes, dataSource, Address, BigDecimal } from '@graphprotocol/graph-ts'
-import { ZERO_BD } from './utils'
+import { ZERO_BD, ZERO_BI, TRUST_FACTORY_ADDRESS } from './utils'
 
 export function handleProxyCreation(event: ProxyCreation): void {
 
@@ -21,7 +21,6 @@ export function handleProxyCreation(event: ProxyCreation): void {
     trust.factory             = event.address as Address
     trust.owners              = callGetOwnerResult.value as Bytes[]
     trust.threshold           = safeInstance.getThreshold()
-    trust.threshold           = safeInstance.getThreshold()
     trust.totalAssetsUSD      = ZERO_BD
     trust.totalAssetsETH      = ZERO_BD
     trust.transactions        = []
@@ -29,6 +28,47 @@ export function handleProxyCreation(event: ProxyCreation): void {
 
     // Instantiate a new datasource
     GnosisSafeContract.create(trustAddr)
+
+    // load factory (create if first exchange)
+    let trustFactory = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+    if (trustFactory === null) {
+      trustFactory = new AzuloTrustFactory(TRUST_FACTORY_ADDRESS)
+      trustFactory.totalTrusts = 0
+      trustFactory.totalBeneficiaries = 0
+      trustFactory.totalVolumeETH = ZERO_BD
+      trustFactory.totalVolumeUSD = ZERO_BD
+      trustFactory.untrackedVolumeUSD = ZERO_BD
+      trustFactory.totalWealthUSD = ZERO_BD
+      trustFactory.totalWealthETH = ZERO_BD
+      trustFactory.txCount = ZERO_BI
+
+      // create new bundle
+      let bundle = new Bundle('1')
+      bundle.ethPrice = ZERO_BD
+      bundle.save()
+    }
+    trustFactory.totalTrusts = trustFactory.totalTrusts + 1
+    trustFactory.save()
+
+    updateAzuloTrustDaily(event)
+
+    // let azulo = AzuloTrustFactory.load(TRUST_FACTORY_ADDRESS)
+    // let timestamp = event.block.timestamp.toI32()
+    // let dayID = timestamp / 86400
+    // let dayStartTimestamp = dayID * 86400
+    // let azuloDayData = AzuloTrustDaily.load(dayID.toString())
+    // if (azuloDayData === null) {
+    //   azuloDayData = new AzuloTrustDaily(dayID.toString())
+    //   azuloDayData.date = dayStartTimestamp
+    //   azuloDayData.dailyVolumeUSD = ZERO_BD
+    //   azuloDayData.dailyVolumeETH = ZERO_BD
+    //   azuloDayData.totalVolumeUSD = ZERO_BD
+    //   azuloDayData.totalVolumeETH = ZERO_BD
+    //   azuloDayData.dailyVolumeUntracked = ZERO_BD
+    // }
+  
+    // azuloDayData.txCount = azulo.txCount
+    // azuloDayData.save()
 
   } else {
     // A trust can be instanTiated from the proxy with incorrect setup values

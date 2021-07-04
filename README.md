@@ -71,7 +71,7 @@ graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph
 
 ```graphql
 {
-  wallet(id: "0x12312312.....") {
+  trust(id: "0x12312312.....") {
     id
     creator
     network

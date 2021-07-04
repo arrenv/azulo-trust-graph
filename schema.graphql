@@ -5,6 +5,10 @@ type AzuloTrustFactory @entity {
     # factory address
     id: ID!
 
+    # total trusts & trustees/beneficiaries
+    totalTrusts: Int!
+    totalBeneficiaries: Int!
+
     # total volume
     totalVolumeUSD: BigDecimal!
     totalVolumeETH: BigDecimal!
@@ -26,6 +30,12 @@ Trust daily volume
 type AzuloTrustDaily @entity {
     id: ID! # timestamp rounded to current day by dividing by 86400
     date: Int!
+
+    # total and new daily trusts
+    totalTrusts: Int!
+    totalBeneficiaries: Int!
+    newTrusts: Int!
+    newBeneficiaries: Int!
 
     dailyVolumeETH: BigDecimal!
     dailyVolumeUSD: BigDecimal!
@@ -163,10 +173,10 @@ type Asset @entity {
   "mirrored from the smart contract"
   symbol: String!
   name: String!
-  decimals: Int!
+  decimals: BigInt!
 
   "used for other stats like marketcap"
-  totalSupply: BigInt!
+  totalSupply: BigInt
 
   "derived prices"
   derivedETH: BigDecimal
@@ -233,4 +243,26 @@ type Pair @entity {
   # Price in terms of the asset pair
   token0Price: BigDecimal!
   token1Price: BigDecimal!
+}
+
+type UniswapFactory @entity {
+  # factory address
+  id: ID!
+
+  # pair info
+  pairCount: Int!
+
+  # total volume
+  totalVolumeUSD: BigDecimal!
+  totalVolumeETH: BigDecimal!
+
+  # untracked values - less confident USD scores
+  untrackedVolumeUSD: BigDecimal!
+
+  # total liquidity
+  totalLiquidityUSD: BigDecimal!
+  totalLiquidityETH: BigDecimal!
+
+  # transactions
+  txCount: BigInt!
 }
