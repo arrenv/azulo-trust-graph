@@ -60,14 +60,18 @@ $ graph auth https://api.thegraph.com/deploy/ <token>
 graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ <github username>/<project name>
 ```
 
+## Debugging
+curl --location --request POST 'https://api.thegraph.com/index-node/graphql'  --data-raw '{"query":"{ indexingStatusForPendingVersion(subgraphName: \"<SUBGRAPH_USERNAME>/<SUBGRAPH_NAME>\") { subgraph fatalError { message } nonFatalErrors { message } } }"}'
+
+
 ## Model
 
-- Wallet
+- Trust
     -  Transaction
 
 ## Query samples
 
-### Get Wallet details
+### Get Trust details
 
 ```graphql
 {
