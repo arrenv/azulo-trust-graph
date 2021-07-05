@@ -22,6 +22,8 @@ dataSources:
           file: ./abis/GnosisSafeProxyFactory.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: ProxyCreation(address)
           handler: handleProxyCreation
@@ -43,6 +45,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -64,6 +68,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -85,6 +91,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -106,6 +114,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -127,6 +137,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -148,6 +160,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -169,6 +183,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -190,6 +206,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -211,6 +229,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -232,6 +252,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -253,6 +275,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -274,6 +298,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -295,6 +321,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -316,6 +344,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -337,6 +367,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -358,6 +390,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -379,6 +413,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -400,6 +436,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -421,6 +459,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -442,6 +482,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -463,6 +505,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -484,6 +528,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -505,6 +551,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -526,6 +574,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -547,6 +597,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -568,6 +620,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -589,6 +643,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -610,6 +666,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -631,6 +689,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -652,6 +712,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -673,6 +735,8 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/token.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -720,6 +784,8 @@ templates:
       abis:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: Factory
+          file: ./abis/factory.json
       eventHandlers:
         - event: AddedOwner(address)
           handler: handleAddedOwner

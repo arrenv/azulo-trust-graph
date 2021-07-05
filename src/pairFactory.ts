@@ -5,12 +5,12 @@ import { Bundle, Pair, Asset, UniswapFactory } from '../generated/schema'
 import { Pair as PairTemplate } from '../generated/templates'
 import {
     UNISWAP_PAIRS_FACTORY_ADDRESS,
-  fetchTokenDecimals,
-  fetchTokenName,
-  fetchTokenSymbol,
-  fetchTokenTotalSupply,
-  ZERO_BD,
-  ZERO_BI,
+    fetchTokenDecimals,
+    fetchTokenName,
+    fetchTokenSymbol,
+    fetchTokenTotalSupply,
+    ZERO_BD,
+    ZERO_BI,
 } from './utils'
 
 export function handleNewPair(event: PairCreated): void {

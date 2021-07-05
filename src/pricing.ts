@@ -78,16 +78,19 @@ export function findEthPerToken(asset: Asset): BigDecimal {
   }
   // loop through whitelist and check if paired with any
   for (let i = 0; i < WHITELIST.length; ++i) {
-    let pairAddress = factoryContract.getPair(Address.fromString(asset.id), Address.fromString(WHITELIST[i]))
-    if (pairAddress.toHexString() != ADDRESS_ZERO) {
-      let pair = Pair.load(pairAddress.toHexString())
-      if (pair.token0 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token1 = Asset.load(pair.token1)
-        return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
-      }
-      if (pair.token1 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token0 = Asset.load(pair.token0)
-        return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+    let tryPairAddress = factoryContract.try_getPair(Address.fromString(asset.id), Address.fromString(WHITELIST[i]))
+    if(!tryPairAddress.reverted) {
+      let pairAddress = factoryContract.getPair(Address.fromString(asset.id), Address.fromString(WHITELIST[i]))
+      if (pairAddress.toHexString() != ADDRESS_ZERO) {
+        let pair = Pair.load(pairAddress.toHexString())
+        if (pair.token0 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+          let token1 = Asset.load(pair.token1)
+          return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
+        }
+        if (pair.token1 == asset.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+          let token0 = Asset.load(pair.token0)
+          return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+        }
       }
     }
   }
