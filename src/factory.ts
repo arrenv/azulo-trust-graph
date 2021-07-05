@@ -42,12 +42,9 @@ export function handleProxyCreation(event: ProxyCreation): void {
       trustFactory.totalWealthETH = ZERO_BD
       trustFactory.txCount = ZERO_BI
 
-      // create new bundle
-      let bundle = new Bundle('1')
-      bundle.ethPrice = ZERO_BD
-      bundle.save()
     }
     trustFactory.totalTrusts = trustFactory.totalTrusts + 1
+    trustFactory.totalBeneficiaries = trustFactory.totalBeneficiaries + 1
     trustFactory.save()
 
     updateAzuloTrustDaily(event)

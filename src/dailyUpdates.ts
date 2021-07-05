@@ -15,6 +15,7 @@ export function updateAzuloTrustDaily(event: ProxyCreation): AzuloTrustDaily {
   if (azuloDayData === null) {
     azuloDayData = new AzuloTrustDaily(dayID.toString())
     azuloDayData.date = dayStartTimestamp
+    azuloDayData.newTrusts = 0
     azuloDayData.newBeneficiaries = 0
     azuloDayData.dailyVolumeUSD = ZERO_BD
     azuloDayData.dailyVolumeETH = ZERO_BD
