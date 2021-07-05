@@ -45,6 +45,7 @@ export function addAzuloBeneficiaryDaily(event: AddedOwner): AzuloTrustDaily {
     azuloDayData.totalTrusts = azulo.totalTrusts
     azuloDayData.totalBeneficiaries = azulo.totalBeneficiaries
     azuloDayData.newTrusts = 0
+    azuloDayData.newBeneficiaries = 0
     azuloDayData.dailyVolumeUSD = ZERO_BD
     azuloDayData.dailyVolumeETH = ZERO_BD
     azuloDayData.totalVolumeUSD = ZERO_BD
