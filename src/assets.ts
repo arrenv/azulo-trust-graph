@@ -14,8 +14,15 @@ export function createAsset(assetAddress: string): Asset {
   } else {
     asset.decimals = BigInt.fromI32(18)
   }
-  asset.name = DeFiName.get(assetAddress) as string
-  asset.symbol = DeFiSymbol.get(assetAddress) as string
-  asset.category = DeFiCategory.get(assetAddress) as string
-  return asset
+  if (DeFiName.get(assetAddress)) {
+    asset.name = DeFiName.get(assetAddress) as string
+    asset.symbol = DeFiSymbol.get(assetAddress) as string
+    asset.category = DeFiCategory.get(assetAddress) as string
+    return asset
+  } else {
+    asset.name = assetAddress as string
+    asset.symbol = '???' as string
+    asset.category = 'Unknown' as string
+    return asset
+  }
 }
